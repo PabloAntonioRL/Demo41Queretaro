@@ -1,0 +1,99 @@
+/*
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+*/
+/* 
+    Created on : 20/07/2020, 05:38:45 PM
+    Author     : Pablo
+*/
+
+.panel {
+    display: none;
+    left: 30px;
+    top: 30px;
+    min-width: 400px;
+    max-width: 95%;
+    min-height: 400px;
+    max-height: 85%;
+    position: absolute;
+    z-index: 300;
+    background-color: #17202a;
+    font-size: 14px;
+    border-width: 1px;
+    border-style: solid;
+    /*border-color: $brand-primary;*/
+    margin-top: 10px;
+    margin-left: 10px;
+    border-radius: 10px;
+    box-shadow: 0 10px 7px rgba(0,0,0,.2);
+}
+.panelContent {
+    position:absolute;
+    margin-top: 32px;
+    margin-left: 5px;
+    padding: 10px;
+    width: calc(100% - 10px);
+    height: calc(100% - 38px);
+    overflow-y: scroll;
+    overflow-x: scroll;
+  scrollbar-color: #a9acb9 #323b44; /* thumb and track color */
+  scrollbar-width: thin;
+}
+.closeButton {
+    display: block;
+    right: 0px;
+    top: 0px;
+    position: absolute;
+    z-index: 100;
+}
+
+.panel.big {
+    /*left: 50px;*/
+    top: 50px;
+    width: 70%;
+    height: 90%;
+    min-width: 580px;
+}
+
+.panel.right {
+    right: 10px;
+    position: absolute;
+    z-index: 300;
+}
+.panel.right.collapsed {
+  transform: translateX(105%);
+}
+.panel.left {
+    left: 10px;
+    position: absolute;
+    z-index: 300;
+}
+.panel.left.collapsed {
+  transform: translateX(-105%);
+}
+.panel.up {
+    top: 10px;
+    position: absolute;
+    z-index: 300;
+}
+.panel.bottom {
+    bottom: 10px;
+    position: absolute;
+    z-index: 300;
+}
+
+
+.leftPanel {
+    /*display: none;*/
+    position: absolute;
+    width: 30%;
+    background-color: #17202a; /*#181818;*/
+    height: 100%;
+    left: 0;
+    z-index: 300;
+    transition: transform 1s;
+}
+.leftPanel.collapsed {
+  transform: translateX(-105%);
+}
