@@ -207,21 +207,56 @@
                         </tr>
                     </table>
                     <hr align="left" noshade="noshade" size="2" width="95%" style="color: #bcdb28;"/>
-                    <div id="diasSemana">
+                    <div id="diasSemana" class="headerDiv">
                         Dias de la semana
-                        <div id="graficaDias"></div>
+                        <a class="btn btn-default btn-map" id="hideGraficaDias" role="button" title="Ocultar">
+                            <span class="glyphicon glyphicon-chevron-up"></span>
+                        </a>
                     </div>
+                    <div id="graficaDias" class="contenedorGrafica"></div>
                     <hr align="left" noshade="noshade" size="2" width="95%" style="color: #bcdb28;"/>
-                    <div id="procedencia">
+                    
+                    <div id="procedencia" class="headerDiv">
                         Procedencia
-                        <div id="graficaProcedencia"></div>
-                        <div id="graficaTipo"></div>
+                        <a class="btn btn-default btn-map" id="verVentanaPro" role="button" title="Ver en Ventana"
+                           style="right: 50px">
+                            <span class="glyphicon glyphicon-share"></span>
+                        </a>
+                        <a class="btn btn-default btn-map" id="hideGraficaPro" role="button" title="Ocultar">
+                            <span class="glyphicon glyphicon-chevron-up"></span>
+                        </a>
                     </div>
+                    <div id="graficaProcedencia" class="contenedorGrafica"></div>
                     <hr align="left" noshade="noshade" size="2" width="95%" style="color: #bcdb28;"/>
-                    <div id="graaficaODM">
-                        Matriz Origen-Destino
                         
+                    <div id="tipo" class="headerDiv">
+                        Tipos de Vehículos
+                        <a class="btn btn-default btn-map" id="verVentanaTip" role="button" title="Ver en Ventana" style="right: 50px">
+                            <span class="glyphicon glyphicon-share"></span>
+                        </a>
+                        <a class="btn btn-default btn-map" id="hideGraficaTip" role="button" title="Ocultara">
+                            <span class="glyphicon glyphicon-chevron-up"></span>
+                        </a>
+                    </div>
+                        <div id="graficaTipo" class="contenedorGrafica"></div>
+                    
+                    <hr align="left" noshade="noshade" size="2" width="95%" style="color: #bcdb28;"/>
+                    
+                    <div  class="headerDiv">
+                        Controles Matriz Origen-Destino
+                        <a class="btn btn-default btn-map" id="hideGraficaCon" role="button" title="Ocultara">
+                            <span class="glyphicon glyphicon-chevron-up"></span>
+                        </a>
+                    </div>
+                    <div id="controlesODM" class="contenedorGrafica">
                         <table>
+                            <tr>
+                                <td>Ver Linea de tiempo</td>
+                                <td><label class="switch">
+                                    <input type="checkbox" id="verTimeLine" checked>
+                                        <span class="slider"></span>
+                                    </label></td>
+                            </tr>
                             <tr>
                                 <td>Ver Mapa de Calor</td>
                                 <td><label class="switch">
@@ -249,17 +284,51 @@
                                     </label></td>
                             </tr>
                             <tr>
-                                <td>Cantidad de nodos:</td>
-                                <td><input type="number" id="nNodosODM" value="10"></td>
+                                <td>Cantidad de origenes:</td>
+                                <td><input type="number" id="nOrigenODM" value="5"></td>
+                            </tr><tr>
+                                <td>Cantidad de destinos</td>
+                                <td><input type="number" id="nDestinosODM" value="5"></td>
                             </tr>
                         </table>
-                        <div id="graficaODM"></div>
                     </div>
+                    <div class="headerDiv">
+                        Diagrama de Shanky
+                        <a class="btn btn-default btn-map" id="verVentanaODM" role="button" title="Ver en Ventana" style="right: 50px">
+                            <span class="glyphicon glyphicon-share"></span>
+                        </a>
+                        <a class="btn btn-default btn-map" id="hideGraficaODM" role="button" title="Ocultara">
+                            <span class="glyphicon glyphicon-chevron-up"></span>
+                        </a>
+                    </div>
+                    <div id="graficaODM" class="contenedorGrafica"></div>
                 </div>
             </div>
             
-            <div id="timeMapPanel">
-                <div id="timeLineChart"></div>
+            <div id="timeMapPanel" class="draggable" style="padding-top: 7px">
+                <a class="btn btn-default btn-map closeButton" role="button" title="Cerrar" 
+                     id="cerrarTimeLine"> <span class="glyphicon glyphicon-remove"></span>
+                </a>
+                <div id="timeLineChart" class="nodraggable"></div>
+            </div>
+            
+            <div id="panelShanky" class="panel big draggable">
+                <a class="btn btn-default btn-map closeButton" role="button" title="Cerrar" 
+                     id="cerrarBalloonChartODM"> <span class="glyphicon glyphicon-remove"></span>
+                </a>
+                <div id="graficaShanky" class="nodraggable"></div>
+            </div>
+            <div id="panelTipo" class="panel draggable">
+                <a class="btn btn-default btn-map closeButton" role="button" title="Cerrar" 
+                     id="cerrarBalloonChartTip"> <span class="glyphicon glyphicon-remove"></span>
+                </a>
+                <div id="graficaTipo2" class="nodraggable"></div>
+            </div>
+            <div id="panelProcedencia" class="panel draggable">
+                <a class="btn btn-default btn-map closeButton" role="button" title="Cerrar" 
+                     id="cerrarBalloonChartPro"> <span class="glyphicon glyphicon-remove"></span>
+                </a>
+                <div id="graficaProcedencia2" class="nodraggable"></div>
             </div>
         </div><!-- fin de Map -->
         <div id="infopanel">

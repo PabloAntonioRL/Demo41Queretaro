@@ -12,21 +12,23 @@ and open the template in the editor.
     display: none;
     left: 30px;
     top: 30px;
-    min-width: 400px;
+    min-width: 200px;
     max-width: 95%;
-    min-height: 400px;
+    width: 400px;
+    min-height: 200px;
     max-height: 85%;
+    height: 300px;
     position: absolute;
     z-index: 300;
-    background-color: #17202a;
+    background-color: #17202a82;
     font-size: 14px;
     border-width: 1px;
     border-style: solid;
-    /*border-color: $brand-primary;*/
-    margin-top: 10px;
-    margin-left: 10px;
+    border-color: #c1d92a;
     border-radius: 10px;
     box-shadow: 0 10px 7px rgba(0,0,0,.2);
+    padding: 10px;
+    padding-top: 20px;
 }
 .panelContent {
     position:absolute;
@@ -51,8 +53,9 @@ and open the template in the editor.
 .panel.big {
     /*left: 50px;*/
     top: 50px;
-    width: 70%;
-    height: 90%;
+    left: 10px;
+    width: 720px;
+    height: 420px;
     min-width: 580px;
 }
 
@@ -97,3 +100,4 @@ and open the template in the editor.
 .leftPanel.collapsed {
   transform: translateX(-105%);
 }
+

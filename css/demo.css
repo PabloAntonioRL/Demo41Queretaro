@@ -247,3 +247,31 @@ th, td {
     top: calc(50% - 50px);
     left: calc(50% - 50px);
 }
+
+.headerDiv {
+    border: 1px solid #c1d92a;
+    background-color: #191929;
+    padding-left: 30px;
+    height: 38px;
+    position: relative;
+    padding-top: 8px;
+    margin-bottom: 8px;
+}
+
+.headerDiv a {
+    right: 10px;
+    top: 3px;
+    position: absolute;
+}
+
+.hide {
+    max-height: 0;
+    padding-bottom: 0;
+}  
+
+.contenedorGrafica {
+    transition: transform 1s;
+        -webkit-transition: max-height 0.3s linear;
+    -o-transition: max-height 0.3s linear;
+    transition: max-height 0.3s linear;
+}

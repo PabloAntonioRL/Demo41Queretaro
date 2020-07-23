@@ -15,6 +15,12 @@ define([
     var switch3d = document.getElementById("verODM3d");
     var selectorO = document.getElementById("selectOrigen");
     var verMatriz = document.getElementById("verMatriz");
+    var panelTimeLine = $("#timeMapPanel");
+    var btnVentanaODM = $("#verVentanaODM");
+    var panelShanky = $("#panelShanky");
+    var panelTip = $("#panelTipo");
+    var panelPro = $("#panelProcedencia");
+    var divODM = "graficaODM", divPro="graficaProcedencia", divTip="graficaTipo";
     var actualData = [];
     var loading = $("#loadingGraficas1");
     var timeLine = document.getElementById("timeLineChart");
@@ -131,13 +137,28 @@ define([
         }
         if(inicio && fin) {
             actualizarFeatures(data, inicio, fin);
+            LectoresCharts.crearTimeLine("timeLineChart", data, inicio, fin, origen,null, true);
+            setEventChart();
+        }
+            LectoresCharts.crearGraficaDias("graficaDias", data, origen,null, true);
+            LectoresCharts.crearGraficaTipo(divTip, data, origen,null, true);
+            LectoresCharts.crearGraficaProcedencia(divPro, data, origen,null, true);
+            LectoresCharts.crearGraficaODM(divODM, data, origen,null, true);
+    }
+    function actualizarGraficas(data, inicio, fin) {
+        var origen = selectorO.selectedOptions[0].value;
+        if(origen==="0" || origen ===0){
+            origen=null;
+        }
+        if(inicio && fin) {
+            actualizarFeatures(data, inicio, fin);
             LectoresCharts.crearTimeLine("timeLineChart", data, inicio, fin, origen);
             setEventChart();
         }
-            LectoresCharts.crearGraficaDias("graficaDias", data, origen);
-            LectoresCharts.crearGraficaTipo("graficaTipo", data, origen);
-            LectoresCharts.crearGraficaProcedencia("graficaProcedencia", data, origen);
-            LectoresCharts.crearGraficaODM("graficaODM", data, origen);
+            LectoresCharts.crearGraficaDias("graficaDias", data, origen, null);
+            LectoresCharts.crearGraficaTipo(divTip, data, origen, null);
+            LectoresCharts.crearGraficaProcedencia(divPro, data, origen, null);
+            LectoresCharts.crearGraficaODM(divODM, data, origen, null);
     }
     /*
     * =============================================================================
@@ -291,7 +312,7 @@ define([
         }
         getData(inicio, fin, function (data, i, f) {
             actualData = data;
-            crearGraficas(data, i, f);
+            actualizarGraficas(data, i, f);
             timeRange.inicio = i;
             timeRange.fin = f;
             actualizarLayers(i, f);
@@ -315,7 +336,7 @@ define([
         loading.fadeIn();
         var inicio = fechaI[0].value+" "+horaI.selectedOptions[0].innerHTML;
         var fin = fechaF[0].value+" "+horaF.selectedOptions[0].innerHTML;
-        crearGraficas(actualData, inicio, fin);
+        actualizarGraficas(actualData, inicio, fin);
         loading.fadeOut();
     });
     var btnLabels = $("#labels");
@@ -365,7 +386,7 @@ define([
             }
             var data, feature;
             data = filtrarTime(actualData, startTime, endTime);
-            crearGraficas(data);
+            actualizarGraficas(data);
             timeRange.inicio = startTime;
             timeRange.fin = endTime;
             actualizarLayers(startTime, endTime);
@@ -423,7 +444,7 @@ define([
     selectorO.addEventListener("change", function () {
         var inicio = fechaI[0].value+" "+horaI.selectedOptions[0].innerHTML;
         var fin = fechaF[0].value+" "+horaF.selectedOptions[0].innerHTML;
-        crearGraficas(actualData);
+        actualizarGraficas(actualData);
         actualizarLayers(inicio, fin);
     });
     verMatriz.addEventListener("click", function() {
@@ -436,6 +457,108 @@ define([
             capaMatriz.visible = true;
         }
     });
+    /*
+    * =============================================================================
+    *                  TimeLine
+    * =============================================================================
+    */
+    function setChartPanel(divs) {
+        divs.forEach(function (div) {
+            var panel = $("#"+div);
+            var btn = $("#"+div+"btn");
+            var btnCerrar = $("#"+div+"Cerrar");
+            
+            btn.click(function () {
+                var origen = selectorO.selectedOptions[0].value;
+                Plotly.purge("grafica"+div);
+                divODM = "balloon"+div;
+                LectoresCharts.crearGraficaODM(divODM, actualData, origen,{width: panelShanky.innerWidth()-20, height: panelShanky.innerHeight()-20}, true);
+                panelShanky.fadeIn();
+            });
+        });
+    }
+    // ============================ Balloon ODM ======================================== //
+    btnVentanaODM.click(function () {
+        var origen = selectorO.selectedOptions[0].value;
+        Plotly.purge(divODM);
+        divODM = "graficaShanky";
+        LectoresCharts.crearGraficaODM(divODM, actualData, origen,{width: panelShanky.innerWidth()-20, height: panelShanky.innerHeight()-20}, true);
+        panelShanky.fadeIn();
+    });
+    $("#cerrarBalloonChartODM").click(function () {
+        var origen = selectorO.selectedOptions[0].value;
+        Plotly.purge(divODM);
+        divODM = "graficaODM";
+        LectoresCharts.crearGraficaODM(divODM, actualData, origen,{width: 500}, true);
+        panelShanky.fadeOut();
+    });
+    panelShanky.resize(function (event) {
+        var width = event.currentTarget.clientWidth - 20;
+        var height = event.currentTarget.clientHeight - 30;
+        LectoresCharts.resizeGrafica("graficaShanky", {width: width, height: height});
+        
+    });
+    // ============================ Balloon Procedencia ======================================== //
+    $("#verVentanaPro").click(function () {
+        var origen = selectorO.selectedOptions[0].value;
+        Plotly.purge(divPro);
+        divPro = "graficaProcedencia2";
+        LectoresCharts.crearGraficaProcedencia(divPro, actualData, origen,{width: panelPro.innerWidth()-20, height: panelPro.innerHeight()-20}, true);
+        panelPro.fadeIn();
+    });
+    $("#cerrarBalloonChartPro").click(function () {
+        var origen = selectorO.selectedOptions[0].value;
+        Plotly.purge(divPro);
+        divPro = "graficaProcedencia";
+        LectoresCharts.crearGraficaProcedencia(divPro, actualData, origen, null, true);
+        panelPro.fadeOut();
+    });
+    panelPro.resize(function (event) {
+        var width = event.currentTarget.clientWidth - 20;
+        var height = event.currentTarget.clientHeight - 30;
+        LectoresCharts.resizeGrafica("graficaProcedencia2", {width: width, height: height});
+    });
+    // ================================ Balloon Tipo ==================================== //
+    $("#verVentanaTip").click(function () {
+        var origen = selectorO.selectedOptions[0].value;
+        Plotly.purge(divTip);
+        divTip = "graficaTipo2";
+        LectoresCharts.crearGraficaTipo(divTip, actualData, origen,{width: panelTip.innerWidth()-20, height: panelTip.innerHeight()-20}, true);
+        panelTip.fadeIn();
+    });
+    $("#cerrarBalloonChartTip").click(function () {
+        var origen = selectorO.selectedOptions[0].value;
+        Plotly.purge(divTip);
+        divTip = "graficaTipo";
+        LectoresCharts.crearGraficaTipo(divTip, actualData, origen, null, true);
+        panelTip.fadeOut();
+    });
+    // ==================================================================== //
+    panelTip.resize(function (event) {
+        var width = event.currentTarget.clientWidth - 20;
+        var height = event.currentTarget.clientHeight - 30;
+        LectoresCharts.resizeGrafica("graficaTipo2", {width: width, height: height});
+        
+    });
+    panelTimeLine.resize(function (event) {
+        var width = event.currentTarget.clientWidth - 10;
+        var height = event.currentTarget.clientHeight - 20;
+        LectoresCharts.resizeGrafica("timeLineChart", {width: width, height: height});
+        
+    });
+    
+    $("#cerrarTimeLine").click(function() {
+        $("#timeMapPanel").fadeOut();
+        document.getElementById("verTimeLine").checked = false;
+    });
+    $("#verTimeLine").click(function (e) {
+        var c = e.currentTarget.checked;
+        if(c===true) 
+            $("#timeMapPanel").fadeIn();
+        else
+            $("#timeMapPanel").fadeOut();
+    });
+    
     return {start: start};
 });
 

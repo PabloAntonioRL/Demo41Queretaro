@@ -187,9 +187,11 @@ define([
         var id = element.id;
         if (collapsed) {
             classes.splice(classes.indexOf('collapsed'), 1);
+            //$("#timeMapPanel").fadeIn();
         } else {
             padding[id] = 0;
             classes.push('collapsed');
+            //$("#timeMapPanel").fadeOut();
         }
         button.toggleClass("active", collapsed);
         button.find("> span").toggleClass("glyphicon-chevron-right", !collapsed);
@@ -197,6 +199,83 @@ define([
         // Update the class list on the element
         element.className = classes.join(' ');
     }
+    // ==================================================================== //
+    var btnHidePro = $("#hideGraficaPro");
+    btnHidePro.click(function (element) {
+        var chart = document.getElementById("graficaProcedencia");
+        var active = btnHidePro.hasClass("active"); 
+        var classes = chart.className.split(' ');
+        if(active) {
+            classes.splice(classes.indexOf('hide'), 1);
+        } else {
+            classes.push('hide');
+        }
+        btnHidePro.toggleClass("active", !active);
+        btnHidePro.find("> span").toggleClass("glyphicon-chevron-up", active);
+        btnHidePro.find("> span").toggleClass("glyphicon-chevron-down", !active);
+        chart.className = classes.join(' ');
+    });
+    var btnHideTip = $("#hideGraficaTip");
+    btnHideTip.click(function (element) {
+        var active = btnHideTip.hasClass("active"); 
+        var chart = document.getElementById("graficaTipo");
+        var classes = chart.className.split(' ');
+        if(active) {
+            classes.splice(classes.indexOf('hide'), 1);
+        } else {
+            classes.push('hide');
+        }
+        btnHideTip.toggleClass("active", !active);
+        btnHideTip.find("> span").toggleClass("glyphicon-chevron-up", active);
+        btnHideTip.find("> span").toggleClass("glyphicon-chevron-down", !active);
+        chart.className = classes.join(' ');
+    });
+    
+    var btnHideDia = $("#hideGraficaDias");
+    btnHideDia.click(function (element) {
+        var active = btnHideDia.hasClass("active"); 
+        var chart = document.getElementById("graficaDias");
+        var classes = chart.className.split(' ');
+        if(active) {
+            classes.splice(classes.indexOf('hide'), 1);
+        } else {
+            classes.push('hide');
+        }
+        btnHideDia.toggleClass("active", !active);
+        btnHideDia.find("> span").toggleClass("glyphicon-chevron-up", active);
+        btnHideDia.find("> span").toggleClass("glyphicon-chevron-down", !active);
+        chart.className = classes.join(' ');
+    });
+    var btnHideCon = $("#hideGraficaCon");
+    btnHideCon.click(function (element) {
+        var active = btnHideCon.hasClass("active"); 
+        var chart = document.getElementById("controlesODM");
+        var classes = chart.className.split(' ');
+        if(active) {
+            classes.splice(classes.indexOf('hide'), 1);
+        } else {
+            classes.push('hide');
+        }
+        btnHideCon.toggleClass("active", !active);
+        btnHideCon.find("> span").toggleClass("glyphicon-chevron-up", active);
+        btnHideCon.find("> span").toggleClass("glyphicon-chevron-down", !active);
+        chart.className = classes.join(' ');
+    });
+    var btnHideODM = $("#hideGraficaODM");
+    btnHideODM.click(function (element) {
+        var active = btnHideODM.hasClass("active"); 
+        var chart = document.getElementById("graficaODM");
+        var classes = chart.className.split(' ');
+        if(active) {
+            classes.splice(classes.indexOf('hide'), 1);
+        } else {
+            classes.push('hide');
+        }
+        btnHideODM.toggleClass("active", !active);
+        btnHideODM.find("> span").toggleClass("glyphicon-chevron-up", active);
+        btnHideODM.find("> span").toggleClass("glyphicon-chevron-down", !active);
+        chart.className = classes.join(' ');
+    });
         
 });
 /* 

@@ -67,7 +67,7 @@ define([
                     origen: origen.id,
                     destino: destino.id
                 };
-                arc = Shapes.create3dArcBy2Points(reference, origen.shape, destino.shape, [1815, 2800], id+"-"+f+"-"+j, p, 50);
+                arc = Shapes.create3dArcBy2Points(reference, origen.shape, destino.shape, [1850, 2800], id+"-"+f+"-"+j, p, 50);
                 layer.model.put(arc);
             }
         }

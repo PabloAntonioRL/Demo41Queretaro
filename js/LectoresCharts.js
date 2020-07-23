@@ -7,7 +7,7 @@ define([], function () {
     var leftP = $("#panelIzquierdo");
     var timePanel = $("#timeMapPanel");
     var generalLayout = {
-        autosize: false,
+        //autosize: false,
         width: leftP.innerWidth()-30,
         height: 200,
         margin: {
@@ -27,8 +27,8 @@ define([], function () {
             gridcolor: '#6a6868',
             zerolinecolor: "#bdbdbd"
         },
-        paper_bgcolor: '#17202a',
-        plot_bgcolor: '#17202a'
+        paper_bgcolor: '#17202a82',
+        plot_bgcolor: '#17202a82'
     };
     
     function merge(obj1, obj2) {
@@ -37,6 +37,16 @@ define([], function () {
         for(key in obj2) newObj[key] = obj2[key];
         return newObj;
     }
+    function ordenacion(a, b) {
+            if (a.value > b.value) {
+              return -1;
+            }
+            if (a.value < b.value) {
+              return 1;
+            }
+            // a must be equal to b
+            return 0;
+        }
     /* 
     * ==============================================================================================
     *                                   Grafica de dias de la semana
@@ -71,9 +81,7 @@ define([], function () {
         string.replace(/ /g, "");
         return string.toLowerCase();
     }
-    function crearGraficaProcedencia(div, data, origen) {
-        //var origen = document.getElementById("selectOrigen");
-        layout = merge(generalLayout, layout);
+    function crearGraficaProcedencia(div, data, origen,setLayout, firsTime) {
         var zonas = {
             "estado": [
               "Aguascalientes", "Baja California", "Baja California Sur", "Colima", "Distrito Federal", "Durango",  "Estado de México", /*"Federal", */"Guanajuato", "Guerrero",
@@ -88,7 +96,7 @@ define([], function () {
         var labels =[], parents=[], values=[];
         var es = [], index={}, i=0;
         //data = data[origen];
-        if(origen) {
+        if(origen && origen !=="0") {
             o=origen;
             for(var d in data[o]) {
                     for(var f in data[o][d]) {
@@ -130,16 +138,7 @@ define([], function () {
             }
         }
     }
-        es.sort(function (a, b) {
-            if (a.value > b.value) {
-              return -1;
-            }
-            if (a.value < b.value) {
-              return 1;
-            }
-            // a must be equal to b
-            return 0;
-        });
+        es.sort(ordenacion);
         o = 0;
         for(o in z) {
             labels[labels.length] = z[o];
@@ -180,21 +179,30 @@ define([], function () {
             parents: parents, //["", "Eve", "Eve", "Seth", "Seth", "Eve", "Eve", "Awan", "Eve" ],
             values:  values, //[0, 14, 12, 10, 2, 6, 6, 4, 4],
             outsidetextfont: {size: 10, color: "#377eb8"},
-            leaf: {opacity: 0.4},
+            //leaf: {opacity: 0.4},
             marker: {line: {width: 2}}
         }];
         var layout = merge(generalLayout, {
             height: 200
         });
         
-        Plotly.newPlot(div, dataLayout, layout);
+        if(setLayout)
+            layout = merge(layout, setLayout);
+        if(firsTime === true)
+            Plotly.newPlot(div, dataLayout, layout);
+        else {
+            var chart = document.getElementById(div);
+            var newLayout = chart.layout;
+            layout = merge(layout, newLayout);
+            Plotly.react(div, dataLayout, layout);
+        }
     }
     /* 
     * ==============================================================================================
     *                                   dGrafica de Tipo
     * ============================================================================================== 
     */
-   function crearGraficaTipo(div, data, origen) {
+   function crearGraficaTipo(div, data, origen,setLayout, firsTime) {
         var yo = data.tipo;
         var x = new Array(yo.length), i=0;
         var index={};
@@ -215,7 +223,7 @@ define([], function () {
             y[i] = text[yo[i]];
         }
         var datos =[];
-        if(origen) {
+        if(origen && origen !=="0") {
             o=origen;
             for(var d in data[o]) {
                     for(var f in data[o][d]) {
@@ -264,60 +272,117 @@ define([], function () {
                 t: 0
             },
             font: {
-                color: "#ffffff"
+            color: "#ffffff"
             },
             xaxis: {
-                gridcolor: '#6a6868'
+                gridcolor: '#6a6868',
+                zerolinecolor: "#bdbdbd"
             },
-            paper_bgcolor: '#17202a',
-            plot_bgcolor: '#17202a'
+            yaxis: {
+                gridcolor: '#6a6868',
+                zerolinecolor: "#bdbdbd"
+            },
+            paper_bgcolor: '#17202a82',
+            plot_bgcolor: '#17202a82'
         };
-        Plotly.newPlot(div, dataLayout, layout);
+        //layout = merge(generalLayout, layout);
+        if(setLayout)
+            layout = merge(layout, setLayout);
+        if(firsTime === true)
+            Plotly.newPlot(div, dataLayout, layout);
+        else {
+            var chart = document.getElementById(div);
+            var newLayout = chart.layout;
+            layout = merge(layout, newLayout);
+            Plotly.react(div, dataLayout, layout);
+        }
    }
     /* 
     * ==============================================================================================
     *                                   Grafica de ODM
     * ============================================================================================== 
     */
-    function crearGraficaODM(div, data, origenS) {
+    function resizeGraficaODM(div, newLayout) {
+        var chart = document.getElementById(div);
+        var layout = chart.layout;
+        layout = merge(layout, newLayout);
+        Plotly.relayout(div, layout)
+    }
+    function crearGraficaODM(div, data, origenS, setLayout, firsTime) {
         var labels=[], index={}, i=0, x=[];
         for(var o in data) {
             if(o !== "horas" && o !== "tipo") {
                 labels[i] = o;
-                x[i] = 0;
+                //x[i] = 0;
                 index[o] = i;
                 i++;
             }
         }
         //labels[labels.lencght] = "Otros";
         var origen =[], destino=[];
+        var j=0;
+        for(o in data) {
+            if(o!=="tipo" && o!=="horas") {
+                i= index[o];
+                origen[i] = origen[i] || {name:o, value:0};
+                for(var d in data[o]) {
+                    j = index[d];
+                    destino[j] = destino[j] || {name:d, value:0};
+                    destino[j].value ++;
+                    origen[i].value ++;
+                }
+            }
+        }
+        origen.sort(ordenacion);
+        destino.sort(ordenacion);
+        var nOrigen=document.getElementById("nOrigenODM").value||5, nDestino =document.getElementById("nDestinosODM").value||5, k=0;
         i=0;
         var datos =[], source=[], target=[];
-        if(origenS) {
+        if(origenS && origenS !=="0") {
             o=origenS;
-            origen[origen.length] = {name:o, value:data[o].length};
-                for(var d in data[o]) {
-                    destino[destino.length]={name:d, value: data[o][d].length};
+            
+                for(j=0; j<nDestino; j++) {
+                    d = destino[j].name;
                     for(var f in data[o][d]) {
                         for(var e in data[o][d][f]) {
                             if(e !== "hora") {
                                 datos = data[o][d][f][e];
                                 for(var v in datos) {
-                                    x[i] = x[i] || 0;
-                                    x[i] += datos[v];
+                                    x[k] = x[k] || 0;
+                                    x[k] += datos[v];
                                 }
                             }
                         }
                     }
-                    source[i] = index[o];
-                    target[i] = index[d];
-                    i++;
+                    source[k] = index[o];
+                    target[k] = index[d];
+                    k++;
                 }
         } else {
-        for(o in data) {
+            for(i=0; i<nOrigen; i++) {
+                o = origen[i].name;
+                for(j=0; j<nDestino; j++) {
+                    d = destino[j].name;
+                    for(var f in data[o][d]) {
+                        for(var e in data[o][d][f]) {
+                            if(e !== "hora") {
+                                datos = data[o][d][f][e];
+                                for(var v in datos) {
+                                    x[k] = x[k] || 0;
+                                    x[k] += datos[v];
+                                }
+                            }
+                        }
+                    }
+                    source[k] = index[o];
+                    target[k] = index[d];
+                    k++;
+                }
+            }
+        /*for(o in data) {
             if(o !== "horas" && o !== "tipo") {
                 origen[origen.length] = {name:o, value:data[o].length};
-                for(var d in data[o]) {
+                for(d in data[o]) {
                     destino[destino.length]={name:d, value: data[o][d].length};
                     for(var f in data[o][d]) {
                         for(var e in data[o][d][f]) {
@@ -335,38 +400,12 @@ define([], function () {
                     i++;
                 }
             }
-        }
+        }*/
     }
-        var n=i, no=[], nx=[], nd=[], t=0;
-        for(i=0; i<n-1; i++) {
-            if(x[i] < x[i+1]) {
-                f = x[i];
-                x[i] = x[i+1];
-                x[i+1] = f;
-                o = source[i];
-                source[i] = source[i+1];
-                source[i+1] = o;
-                d = target[i];
-                target[i] = target[i+1];
-                target[i+1] = d;
-                
-                /*nx[i] = x[i];
-                no[i] = source[i];
-                nd[i] = target[i];*/
-                i-=3;
-            }
-        }
-        var nodeN = document.getElementById("nNodosODM").value;
-        n = nodeN || 10;
-        for(i=0; i<n; i++) {
-                nd[i] = target[i];
-                no[i] = source[i];
-                nx[i] = x[i];
-        }
         console.log(labels);
-        console.log(nd);
-        console.log(no);
-        console.log(nx);
+        console.log(target);
+        console.log(source);
+        console.log(x);
         var dataLayout = {
             type: "sankey",
             orientation: "h",
@@ -377,38 +416,43 @@ define([], function () {
                 color: "black",
                 width: 0.5
               },
-              label: labels,
-             //label: ["A1", "A2", "B1", "B2", "C1", "C2"],
-             //color: ["blue", "blue", "blue", "blue", "blue", "blue"]
+              label: labels
                 },
 
             link: {
-                source: no,
-                target: nd,
-                value: nx
-              //source: [0,1,0,2,3,3],
-              //target: [2,3,3,4,4,5],
-              //value:  [8,4,2,8,4,2]
+                source: target,
+                target: source,
+                value: x
             }
         };
         dataLayout = [dataLayout];
         var layout = {
             height: 400,
-            width: 700,
+            width: 500,
             font: {
               size: 8
             }
         };
         layout = merge(generalLayout, layout);
-        Plotly.newPlot(div, dataLayout, layout);
+        if(setLayout)
+            layout = merge(layout, setLayout);
+        if(firsTime === true)
+            Plotly.newPlot(div, dataLayout, layout);
+        else {
+            var chart = document.getElementById(div);
+            var newLayout = chart.layout;
+            layout = merge(layout, newLayout);
+            Plotly.react(div, dataLayout, layout);
+        }
     }
     /* 
     * ==============================================================================================
     *                                   Grafica de Linea de tiempo
     * ============================================================================================== 
     */
-   function crearTimeLine(div, data, inicio, fin, origen) {
-       var layout = {
+    
+    function crearTimeLine(div, data, inicio, fin, origen, firsTime) {
+        var layout = {
             autosize: false,
             width: timePanel.innerWidth(),
             height: timePanel.innerHeight()-5,
@@ -440,7 +484,15 @@ define([], function () {
             plot_bgcolor: '#17202a82',
        };
        data = formatTimeLine(data, inicio, fin, origen);
-       Plotly.newPlot(div, data, layout, {responsive: true});
+       
+        if(firsTime === true)
+            Plotly.newPlot(div, data, layout, {responsive: true});
+        else {
+            var chart = document.getElementById(div);
+            var newLayout = chart.layout;
+            layout = merge(layout, newLayout);
+            Plotly.react(div, data, layout, {responsive: true});
+        }
     }
     function formatTimeLine(data, inicio, fin, origen) {
         var newData = [];
@@ -452,7 +504,7 @@ define([], function () {
             y[i] = 0;
         }
         var datos =[];
-        if(origen) {
+        if(origen && origen !=="0") {
             o=origen;
             for(var d in data[o]) {
                     for(var f in data[o][d]) {
@@ -494,12 +546,20 @@ define([], function () {
         }];
     }
     
+    function resizeGrafica(div, newLayout) {
+        var chart = document.getElementById(div);
+        var layout = chart.layout;
+        layout = merge(layout, newLayout);
+        Plotly.relayout(div, layout);
+    }
     return {
         crearGraficaDias: crearGraficaDias,
         crearGraficaProcedencia: crearGraficaProcedencia,
         crearGraficaODM: crearGraficaODM,
         crearTimeLine: crearTimeLine,
-        crearGraficaTipo: crearGraficaTipo
+        crearGraficaTipo: crearGraficaTipo,
+        resizeGraficaODM: resizeGraficaODM,
+        resizeGrafica: resizeGrafica
     };
 });
 
