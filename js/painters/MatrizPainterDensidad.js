@@ -8,11 +8,10 @@ define(["luciad/view/feature/FeaturePainter",
         'samples/common/IconFactory',
         'luciad/util/ColorMap',
         "recursos/js/Shapes",
-        "./colorManager",
-        "luciad/view/style/complexstroke/PatternFactory",
-        "luciad/view/style/complexstroke/ArrowType"
-    ], function (FeaturePainter, ShapeFactory, IconFactory, ColorMap,  Shapes, colorManager, PatternFactory, ArrowType) {
+        "./colorManager"
+    ], function (FeaturePainter, ShapeFactory, IconFactory, ColorMap,  Shapes, colorManager) {
     
+    //colorManager.loadPalettes();
     function layerPainter() {
         this.outCircle = {
             draped: false,
@@ -46,7 +45,7 @@ define(["luciad/view/feature/FeaturePainter",
             zOrder: 1,
             stroke: { width: 4, color: sAzul } 
         };
-        colorManager.loadPalettes();
+        
         this.color0 = colorManager.getGradianColor("viridis_r", 0, 1).rgb;
         this.color1 = colorManager.getGradianColor("viridis_r", 25, 1).rgb;
         this.color2 = colorManager.getGradianColor("viridis_r", 50, 1).rgb;
@@ -92,6 +91,13 @@ define(["luciad/view/feature/FeaturePainter",
                 {level: y+=x*3, color: "rgba(  255, 255,   0, 1.0)"},
                 {level: y+=x*4, color: "rgba(255, 0, 0, 1.0)"}
                 ]);
+    /*var gradient = ColorMap.createGradientColorMap([
+                {level: y, color: colorManager.getGradianColor("viridis_r", 0, 1).rgb},
+                {level: y+=x, color: colorManager.getGradianColor("viridis_r", 25, 1).rgb},
+                {level: y+=x*2, color: colorManager.getGradianColor("viridis_r", 50, 1).rgb},
+                {level: y+=x*3, color: colorManager.getGradianColor("viridis_r", 75, 1).rgb},
+                {level: y+=x*4, color: colorManager.getGradianColor("viridis_r", 100, 1).rgb}
+                ]);*/
     if(x <10) {
         layerPainter.prototype.density = {
              colorMap: gradient
@@ -99,13 +105,17 @@ define(["luciad/view/feature/FeaturePainter",
     }
     layerPainter.prototype.updateDensity = function (layer, x) {
         y=0;
+        try {
+            var color = document.getElementById("selectColorODM").selectedOptions[0].value;
+        } catch(e) {}
+        color = color || "viridis_r";
         layer.painter.density = {
                 colorMap: ColorMap.createGradientColorMap([
-                {level: y, color: "rgba(  0,   0,   255, 1)"},
-                {level: y+=x, color: "rgba(  0, 100,   255, 1)"},
-                {level: y+=x*2, color: "rgba(  0, 255,   255, 1.0)"},
-                {level: y+=x*3, color: "rgba(  255, 255,   0, 1.0)"},
-                {level: y+=x*4, color: "rgba(255, 0, 0, 1.0)"}
+                {level: y, color: colorManager.getGradianColor(color, 0, 1).rgb},
+                {level: y+=x, color: colorManager.getGradianColor(color, 25, 1).rgb},
+                {level: y+=x*2, color: colorManager.getGradianColor(color, 50, 1).rgb},
+                {level: y+=x*3, color: colorManager.getGradianColor(color, 75, 1).rgb},
+                {level: y+=x*4, color: colorManager.getGradianColor(color, 100, 1).rgb}
                 ])
             };
     };

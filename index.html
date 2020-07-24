@@ -214,7 +214,6 @@
                         </a>
                     </div>
                     <div id="graficaDias" class="contenedorGrafica"></div>
-                    <hr align="left" noshade="noshade" size="2" width="95%" style="color: #bcdb28;"/>
                     
                     <div id="procedencia" class="headerDiv">
                         Procedencia
@@ -227,7 +226,6 @@
                         </a>
                     </div>
                     <div id="graficaProcedencia" class="contenedorGrafica"></div>
-                    <hr align="left" noshade="noshade" size="2" width="95%" style="color: #bcdb28;"/>
                         
                     <div id="tipo" class="headerDiv">
                         Tipos de Vehículos
@@ -240,7 +238,6 @@
                     </div>
                         <div id="graficaTipo" class="contenedorGrafica"></div>
                     
-                    <hr align="left" noshade="noshade" size="2" width="95%" style="color: #bcdb28;"/>
                     
                     <div  class="headerDiv">
                         Controles Matriz Origen-Destino
@@ -272,6 +269,11 @@
                                     <input type="checkbox" id="verMatriz">
                                         <span class="slider"></span>
                                     </label></td>
+                            </tr><tr>
+                                <td>Color Matriz</td>
+                                <td><select id="selectColorODM">
+                                        <option value="0">Todos</option>
+                                    </select></td>
                             </tr>
                             <tr>
                                 <td>Control de densidad</td>
@@ -302,6 +304,17 @@
                         </a>
                     </div>
                     <div id="graficaODM" class="contenedorGrafica"></div>
+                    
+                    <div class="headerDiv">
+                        HeatMap
+                        <a class="btn btn-default btn-map" id="verVentanaHeat" role="button" title="Ver en Ventana" style="right: 50px">
+                            <span class="glyphicon glyphicon-share"></span>
+                        </a>
+                        <a class="btn btn-default btn-map" id="hideGraficaHeat" role="button" title="Ocultara">
+                            <span class="glyphicon glyphicon-chevron-up"></span>
+                        </a>
+                    </div>
+                    <div id="graficaHeat" class="contenedorGrafica"></div>
                 </div>
             </div>
             
@@ -329,6 +342,12 @@
                      id="cerrarBalloonChartPro"> <span class="glyphicon glyphicon-remove"></span>
                 </a>
                 <div id="graficaProcedencia2" class="nodraggable"></div>
+            </div>
+            <div id="panelHeatMap" class="panel draggable">
+                <a class="btn btn-default btn-map closeButton" role="button" title="Cerrar" 
+                     id="cerrarBalloonChartHeat"> <span class="glyphicon glyphicon-remove"></span>
+                </a>
+                <div id="graficaHeatMap2" class="nodraggable"></div>
             </div>
         </div><!-- fin de Map -->
         <div id="infopanel">

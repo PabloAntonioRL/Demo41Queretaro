@@ -32,7 +32,7 @@ and open the template in the editor.
 }
 .panelContent {
     position:absolute;
-    margin-top: 32px;
+    margin-top: 39px;
     margin-left: 5px;
     padding: 10px;
     width: calc(100% - 10px);

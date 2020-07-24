@@ -20,7 +20,8 @@ define([
     var panelShanky = $("#panelShanky");
     var panelTip = $("#panelTipo");
     var panelPro = $("#panelProcedencia");
-    var divODM = "graficaODM", divPro="graficaProcedencia", divTip="graficaTipo";
+    var panelHeat = $("#panelHeatMap");
+    var divODM = "graficaODM", divPro="graficaProcedencia", divTip="graficaTipo", divHeat="graficaHeat";
     var actualData = [];
     var loading = $("#loadingGraficas1");
     var timeLine = document.getElementById("timeLineChart");
@@ -144,6 +145,7 @@ define([
             LectoresCharts.crearGraficaTipo(divTip, data, origen,null, true);
             LectoresCharts.crearGraficaProcedencia(divPro, data, origen,null, true);
             LectoresCharts.crearGraficaODM(divODM, data, origen,null, true);
+            LectoresCharts.crearHeatMap(divHeat, data, origen,null, true);
     }
     function actualizarGraficas(data, inicio, fin) {
         var origen = selectorO.selectedOptions[0].value;
@@ -159,6 +161,7 @@ define([
             LectoresCharts.crearGraficaTipo(divTip, data, origen, null);
             LectoresCharts.crearGraficaProcedencia(divPro, data, origen, null);
             LectoresCharts.crearGraficaODM(divODM, data, origen, null);
+            LectoresCharts.crearHeatMap(divHeat, data, origen,null);
     }
     /*
     * =============================================================================
@@ -533,20 +536,42 @@ define([
         LectoresCharts.crearGraficaTipo(divTip, actualData, origen, null, true);
         panelTip.fadeOut();
     });
-    // ==================================================================== //
     panelTip.resize(function (event) {
         var width = event.currentTarget.clientWidth - 20;
         var height = event.currentTarget.clientHeight - 30;
         LectoresCharts.resizeGrafica("graficaTipo2", {width: width, height: height});
         
     });
+    // ==================================================================== //
     panelTimeLine.resize(function (event) {
         var width = event.currentTarget.clientWidth - 10;
         var height = event.currentTarget.clientHeight - 20;
         LectoresCharts.resizeGrafica("timeLineChart", {width: width, height: height});
         
     });
+    // ==================================================================== //
+    $("#verVentanaHeat").click(function () {
+        var origen = selectorO.selectedOptions[0].value;
+        Plotly.purge(divHeat);
+        divHeat = "graficaHeatMap2";
+        LectoresCharts.crearHeatMap(divHeat, actualData, origen,{width: panelHeat.innerWidth()-20, height: panelHeat.innerHeight()-20}, true);
+        panelHeat.fadeIn();
+    });
+    $("#cerrarBalloonChartHeat").click(function () {
+        var origen = selectorO.selectedOptions[0].value;
+        Plotly.purge(divHeat);
+        divHeat = "graficaHeat";
+        LectoresCharts.crearHeatMap(divHeat, actualData, origen, null, true);
+        panelHeat.fadeOut();
+    });
+    panelHeat.resize(function (event) {
+        var width = event.currentTarget.clientWidth - 20;
+        var height = event.currentTarget.clientHeight - 30;
+        LectoresCharts.resizeGrafica("graficaHeatMap2", {width: width, height: height});
+        
+    });
     
+    // ==================================================================== //
     $("#cerrarTimeLine").click(function() {
         $("#timeMapPanel").fadeOut();
         document.getElementById("verTimeLine").checked = false;

@@ -52,7 +52,7 @@ define([
             else
                 map = MapFactory.makeMap3d("map", {reference: referenceE}, {
                     includeBackground: false, includeElevation: true, includeLayerControl: true,
-                    includeMouseLocation: true, newLayerControl: true, includeBingLayer: ["AerialWithLabels", "Road"]});
+                    includeMouseLocation: true, newLayerControl: true, includeBingLayer: ["AerialWithLabels", "Road", "CanvasDark"]});
         } 
         CrearCapas();
         //map.effects.light = LightEffect.createSunLight();
@@ -274,6 +274,21 @@ define([
         btnHideODM.toggleClass("active", !active);
         btnHideODM.find("> span").toggleClass("glyphicon-chevron-up", active);
         btnHideODM.find("> span").toggleClass("glyphicon-chevron-down", !active);
+        chart.className = classes.join(' ');
+    });
+    var btnHideHeat = $("#hideGraficaHeat");
+    btnHideHeat.click(function (element) {
+        var active = btnHideHeat.hasClass("active"); 
+        var chart = document.getElementById("graficaHeat");
+        var classes = chart.className.split(' ');
+        if(active) {
+            classes.splice(classes.indexOf('hide'), 1);
+        } else {
+            classes.push('hide');
+        }
+        btnHideHeat.toggleClass("active", !active);
+        btnHideHeat.find("> span").toggleClass("glyphicon-chevron-up", active);
+        btnHideHeat.find("> span").toggleClass("glyphicon-chevron-down", !active);
         chart.className = classes.join(' ');
     });
         
