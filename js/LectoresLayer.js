@@ -46,7 +46,7 @@ define([
             console.log("============ Conectado con Servidor ODM ============");
             console.log(data);
             if(typeof data === "string") {
-                alert(data);
+                //alert(data);
                 if(errorHandeler)
                     errorHandeler(data, inicio, fin);
             } else
@@ -213,7 +213,7 @@ define([
             } else
                 return visible;
         };
-        capaLectores.filter = function(feature) { 
+        /*capaLectores.filter = function(feature) { 
             if(selectOrigen) {
                 var Id = feature.properties.Id;
                 if(Id === selectOrigen)
@@ -222,7 +222,7 @@ define([
                     return false;
             } else
                 return true; 
-        };
+        };*/
     }
     
     function actualizarFeatures(data, inicio, fin) {
@@ -239,6 +239,7 @@ define([
         
         MatrizLayer.destruirMatriz(capaMatrizDensidad);
         MatrizLayer.destruirMatriz(capaMatriz);
+        var matriz={}, mayor=0;
         features.forEach(function (feature) {
         //for(var i in features) {
             totalH = [];
@@ -247,7 +248,7 @@ define([
             var lon = feature.shape.x;
             var lat = feature.shape.y;
             var o = data[id];
-            var matriz ={}, hora=0;
+            var hora=0;
             var destino;
             total=0;
             matriz[id] = {};
@@ -269,16 +270,10 @@ define([
                     totalH[i] +=hora;
                     total += hora;
                     matriz[id][d][f] = {total: hora, hora: o[d][f]["hora"]};
+                    mayor = hora>mayor? hora: mayor;
                     hora=0;
                 }
                 destino = capaLectores.model.get(d);
-                if(destino) {
-                    if(switch3d.checked)
-                        MatrizLayer.crearDensidad3D(capaMatrizDensidad, feature, destino, matriz[id][d]);
-                    else
-                        MatrizLayer.crearDensidad(capaMatrizDensidad, feature, destino, matriz[id][d]);
-                    MatrizLayer.crearConexion(capaMatriz, feature, destino, matriz[id][d]);
-                }
             }
             var p = {
                 Id: id,
@@ -290,11 +285,25 @@ define([
                 "Total en rango de tiempo": total,
                 "Total por hora": totalH,
                 "Horas": x,
-                Matriz: matriz
+                Matriz: matriz[id]
             };
             feature.properties = p;
             capaLectores.model.put(features[i]);
         });
+        
+        for(var o in matriz) {
+            var origen = capaLectores.model.get(o);
+            for(var d in matriz) {
+                var destino = capaLectores.model.get(d);
+                if(origen && destino) {
+                    if(switch3d.checked)
+                        MatrizLayer.crearDensidad3D(capaMatrizDensidad, origen, destino, matriz[o][d], mayor);
+                    else
+                        MatrizLayer.crearDensidad(capaMatrizDensidad, origen, destino, matriz[o][d], mayor);
+                    MatrizLayer.crearConexion(capaMatriz, origen, destino, matriz[o][d]);
+                }
+            }
+        }
     }
     
     function actualizarDatos() {
@@ -303,13 +312,13 @@ define([
         var ini = Date.parse(inicio);
         var fi = Date.parse(fin);
         if(ini >= fi) {
-            alert("La fecha de inicio debe ser menor que la fecha de fin");
+            //alert("La fecha de inicio debe ser menor que la fecha de fin");
             loading.fadeOut();
             return 0;
         }
         var rango = fi - ini;
         if(rango > (1000*60*60*10)) {
-            alert("El rango de tiempo no debe ser mayor a 10 horas");
+            //alert("El rango de tiempo no debe ser mayor a 10 horas");
             loading.fadeOut();
             return 0;
         }
@@ -335,7 +344,7 @@ define([
         var fin = fechaF[0].value+" "+horaF.selectedOptions[0].innerHTML;
         actualizarFeatures(actualData, inicio, fin);
     });
-    $("#update").click(function () {
+    $("#updateCharts").click(function () {
         loading.fadeIn();
         var inicio = fechaI[0].value+" "+horaI.selectedOptions[0].innerHTML;
         var fin = fechaF[0].value+" "+horaF.selectedOptions[0].innerHTML;

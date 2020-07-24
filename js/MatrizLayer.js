@@ -52,40 +52,51 @@ define([
         });
     }
     
-    function crearDensidad3D(layer, origen, destino, properties) {
+    function crearDensidad3D(layer, origen, destino, properties, mayor) {
         var id = origen.id+"-"+destino.id;
-        var fecha, total, f, arc;
+        var fecha, total, f, arc, maxArcs=20;
         for(var i in properties) {
             total = properties[i].total;
             fecha = properties[i].hora;
             f = Date.parse(fecha);
+            if(mayor) {
+                total = (total / mayor);
+                total = parseInt(total * maxArcs)+1;
+            }
             for(var j=0; j<total; j++) {
                 var p = {
                     hora: fecha,
                     horaInt: f,
                     id: id+"-"+j,
                     origen: origen.id,
-                    destino: destino.id
+                    destino: destino.id,
+                    total: properties[i].total
                 };
-                arc = Shapes.create3dArcBy2Points(reference, origen.shape, destino.shape, [1850, 2800], id+"-"+f+"-"+j, p, 50);
+                arc = Shapes.create3dArcBy2Points(reference, origen.shape, destino.shape, [1850, 2800], id+"-"+f+"-"+j, p, 20);
                 layer.model.put(arc);
             }
         }
-        
     }
     
-    function crearDensidad(layer, origen, destino, properties) {
+    function crearDensidad(layer, origen, destino, properties, mayor) {
         var id = origen.id+"-"+destino.id;
-        var fecha, total, f, line;
+        var fecha, total, f, line, maxArcs=20;
         for(var i in properties) {
             total = properties[i].total;
             fecha = properties[i].hora;
             f = Date.parse(fecha);
+            if(mayor) {
+                total = (total / mayor);
+                total = parseInt(total * maxArcs)+1;
+            }
             for(var j=0; j<total; j++) {
                 var p = {
                     hora: fecha,
                     horaInt: f,
-                    id: id+"-"+j
+                    id: id+"-"+j,
+                    origen: origen.id,
+                    destino: destino.id,
+                    total: properties[i].total
                 };
                 var x=[origen.shape.x, destino.shape.x];
                 var y = [origen.shape.y, destino.shape.y];

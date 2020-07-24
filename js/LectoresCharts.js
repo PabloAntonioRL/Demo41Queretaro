@@ -472,6 +472,8 @@ define(["./painters/colorManager"], function (colorManager) {
     */
     
     function crearTimeLine(div, data, inicio, fin, origen, firsTime) {
+        var ini = Date.parse(inicio);
+        var fi = Date.parse(fin);
         var layout = {
             autosize: false,
             width: timePanel.innerWidth(),
@@ -493,7 +495,7 @@ define(["./painters/colorManager"], function (colorManager) {
                             stepmode: 'backward'
                         },{step: 'all'}
                 ]},
-                rangeslider: {range: [inicio, fin]},
+                rangeslider: {range: [ini, fi]},
                 type: 'date'
             },
             yaxis: {
@@ -508,9 +510,6 @@ define(["./painters/colorManager"], function (colorManager) {
         if(firsTime === true)
             Plotly.newPlot(div, data, layout, {responsive: true});
         else {
-            var chart = document.getElementById(div);
-            var newLayout = chart.layout;
-            layout = merge(layout, newLayout);
             Plotly.react(div, data, layout, {responsive: true});
         }
     }

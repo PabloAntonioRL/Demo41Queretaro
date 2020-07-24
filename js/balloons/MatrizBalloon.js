@@ -45,6 +45,7 @@ define([
                     color = '';
                 i++;
                 switch(key) {
+                    case "horaInt": break;
                     case "datos": 
                         etiquetaDatos += '</table><hr align="left" noshade="noshade" size="2" width="95%" style="color: #bcdb28;"/><table>';
                         var totales = properties[key];

@@ -82,7 +82,7 @@ define([
                         
                     case "Matriz":
                         etiquetaDatos += '</table><hr align="left" noshade="noshade" size="2" width="95%" style="color: #bcdb28;"/><table>';
-                        var matriz = properties[key][feature.id];
+                        var matriz = properties[key];//[feature.id];
                         etiquetaDatos+= _etiquetaDatos2.replace("$Propertie", "Destino").replace("$Count", "Hora").replace("$Time", "Veiculos").replace("$COLOR", color);
                         color = color === ""? "#19232c": "";
                         for(var to in matriz) {
