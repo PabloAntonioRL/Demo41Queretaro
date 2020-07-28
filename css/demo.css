@@ -275,3 +275,8 @@ th, td {
     -o-transition: max-height 0.3s linear;
     transition: max-height 0.3s linear;
 }
+
+.smallForm {
+    width: 75px;
+    padding: 6px 5px;
+}

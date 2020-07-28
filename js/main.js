@@ -264,7 +264,7 @@ define([
     var btnHideODM = $("#hideGraficaODM");
     btnHideODM.click(function (element) {
         var active = btnHideODM.hasClass("active"); 
-        var chart = document.getElementById("graficaODM");
+        var chart = document.getElementById("contenedorGraficaODM");
         var classes = chart.className.split(' ');
         if(active) {
             classes.splice(classes.indexOf('hide'), 1);
@@ -289,6 +289,21 @@ define([
         btnHideHeat.toggleClass("active", !active);
         btnHideHeat.find("> span").toggleClass("glyphicon-chevron-up", active);
         btnHideHeat.find("> span").toggleClass("glyphicon-chevron-down", !active);
+        chart.className = classes.join(' ');
+    });
+    var btnHideSel = $("#hideSelectores");
+    btnHideSel.click(function (element) {
+        var active = btnHideSel.hasClass("active"); 
+        var chart = document.getElementById("Selectores");
+        var classes = chart.className.split(' ');
+        if(active) {
+            classes.splice(classes.indexOf('hide'), 1);
+        } else {
+            classes.push('hide');
+        }
+        btnHideSel.toggleClass("active", !active);
+        btnHideSel.find("> span").toggleClass("glyphicon-chevron-up", active);
+        btnHideSel.find("> span").toggleClass("glyphicon-chevron-down", !active);
         chart.className = classes.join(' ');
     });
         

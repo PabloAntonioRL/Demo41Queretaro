@@ -52,25 +52,62 @@ define(["./painters/colorManager"], function (colorManager) {
     *                                   Grafica de dias de la semana
     * ============================================================================================== 
     */
-    function crearGraficaDias(div, data) {
-        var data = [
-            {
-              x: ['Domingo', 'Lunes', 'Martes','Miercoles', 'Jueves','Viernes','Sabado'],
-              y: [20, 14, 23, 10, 30, 15, 22],
-              type: 'bar'
+    function crearGraficaDias(baseUrl, div, setLayout, firsTime) {
+        var inicio=document.getElementById("horaInicio").selectedOptions[0].innerHTML;
+        var fin =document.getElementById("horaFin").selectedOptions[0].innerHTML;
+        var parametros = "?hinicio="+inicio+"&hfin="+fin; 
+        document.getElementById("labelGraficaSemanas").innerHTML = "Conteo Semanal "+inicio+" - "+fin;
+        $.getJSON(baseUrl+"/week"+parametros, function (data) {
+            console.log("============ Conectado con Servidor Week ============");
+            console.log(data);
+            if(typeof data === "string") {
+                alert(data);
+                return 0;
             }
-        ];
-        var layout = {
-            height: 150
-        };
-        layout = merge(generalLayout, layout );
-        layout.margin = {
-            l: 30,
-            r: 25,
-            b: 50,
-            t: 10
-        };
-        Plotly.newPlot(div, data, layout);
+            var mayor = 0;
+            for(var i in data.y) {
+                mayor = data.y[i]>mayor? data.y[i]: mayor;
+            }
+            var p, colores=[];
+            for(var i in data.y) {
+                p = (data.y[i]/mayor) *100;
+                colores[i] = colorManager.getGradianColor("viridis_r", p).rgb;
+            }
+            var dataLayout = [
+                {
+                    x: ['Lunes', 'Martes','Miercoles', 'Jueves','Viernes','Sabado', 'Domingo'],
+                    y: data.y, //[20, 14, 23, 10, 30, 15, 22],
+                    type: 'bar',
+                    marker: {
+                        color: colores
+
+                        }
+                }];
+            var layout = {
+                height: 150
+            };
+            layout = merge(generalLayout, layout );
+            layout.margin = {
+                l: 30,
+                r: 25,
+                b: 50,
+                t: 10
+            };
+            if(setLayout)
+                layout = merge(layout, setLayout);
+            if(firsTime === true)
+                Plotly.newPlot(div, dataLayout, layout);
+            else {
+                var chart = document.getElementById(div);
+                var newLayout = chart.layout;
+                layout = merge(layout, newLayout);
+                Plotly.react(div, dataLayout, layout);
+            }
+            
+        }).fail(function (e) {
+            console.error(e);
+        });
+        
     }
     /* 
     * ==============================================================================================
@@ -81,28 +118,27 @@ define(["./painters/colorManager"], function (colorManager) {
         string.replace(/ /g, "");
         return string.toLowerCase();
     }
+    function onlyUnique(value, index, self) { 
+        return self.indexOf(value) === index;
+    }
     function crearGraficaProcedencia(div, data, origen,setLayout, firsTime) {
-        var zonas = {
-            "estado": [
-              "Aguascalientes", "Baja California", "Baja California Sur", "Colima", "Distrito Federal", "Durango",  "Estado de México", /*"Federal", */"Guanajuato", "Guerrero",
-              "Hidalgo", "Jalisco",  "Michoacán",  "Morelos", "Nuevo León", "Puebla", "Querétaro", "San Luis Potosí", "Sin Identificar","Sinaloa", "Tlaxcala", "Veracruz",
-              "Yucatán", "Zacatecas"
-            ],
-            "zona": [
-              "Occidente", "Norte", "Norte", "Bajío", "Centro",  "Norte","Centro", /*"Zona Federal", */"Bajío", "Sur", "Centro", "Bajío", "Bajío", "Centro",
-              "Norte", "Centro", "Centro", "Norte", "No Identificado", "Norte", "Centro", "Sur", "Sur", "Norte"]
-        };
-        var z = ["Occidente", "Norte", "Bajío", "Centro", /*"Zona Federal", */"Sur", "No Identificado"];
+        var zonas = {"estado": ["Aguascalientes", "Baja California", "Baja California Sur", "Campeche", "Chiapas", "Chihuahua", "Coahuila", "Colima", "Distrito Federal", "Durango", "Estado de M\u00e9xico", "Federal", "Guanajuato", "Guerrero", "Hidalgo", "Jalisco", "Michoac\u00e1n", "Morelos", "Nayarit", "Nuevo Le\u00f3n", "Oaxaca", "Puebla", "Quer\u00e9taro", "Quintana Roo", "San Luis Potos\u00ed", "Sinaloa", "Sonora", "Tabasco", "Tamaulipas", "Tlaxcala", "Veracruz", "Yucat\u00e1n", "Zacatecas"], 
+            "abreviatura": ["Ags", "BC", "BCS", "Camp", "Chis", "Chih", "Coah", "Col", "DF", "Dgo", "EdoMex", "Fed", "Gto", "Gro", "Hgo", "Jal", "Mich", "Mor", "Nay", "NL", "Oax", "Pue", "Qro", "QRoo", "SLP", "Sin", "Son", "Tab", "Tamp", "Tlax", "Ver", "Yuc", "Zac"], 
+            "zona": ["Baj\u00edo", "Norte", "Norte", "Sur", "Sur", "Norte", "Norte", "Baj\u00edo", "Centro", "Norte", "Centro", "Federal", "Baj\u00edo", "Sur", "Centro", "Baj\u00edo", "Baj\u00edo", "Centro", "Baj\u00edo", "Norte", "Sur", "Centro", "Centro", "Sur", "Norte", "Norte", "Norte", "Sur", "Norte", "Centro", "Sur", "Sur", "Norte"]};
+        var z = ["Norte", "Baj\u00edo", "Centro", "Federal","Sur", "No Identificado"];
         var labels =[], parents=[], values=[], colors=[], mayor=0;
         var es = [], index={}, i=0;
         //data = data[origen];
+        z = zonas.zona.filter(onlyUnique);
+        var estados = [];
         if(origen && origen !=="0") {
             o=origen;
             for(var d in data[o]) {
                     for(var f in data[o][d]) {
                         for(var e in data[o][d][f]) {
-                            if(e !== "hora") {
+                            if(e !== "hora" && e!=="origen" && e!=="destino") {
                                 datos = data[o][d][f][e];
+                                estados[estados.length] = e;
                                 if(!index[e]) {
                                     index[e] = i;
                                     i++;
@@ -121,8 +157,9 @@ define(["./painters/colorManager"], function (colorManager) {
                 for(var d in data[o]) {
                     for(var f in data[o][d]) {
                         for(var e in data[o][d][f]) {
-                            if(e !== "hora") {
+                            if(e !== "hora" && e!=="origen" && e!=="destino") {
                                 datos = data[o][d][f][e];
+                                estados[estados.length] = e;
                                 if(!index[e]) {
                                     index[e] = i;
                                     i++;
@@ -138,6 +175,7 @@ define(["./painters/colorManager"], function (colorManager) {
             }
         }
         }
+        estados = estados.filter(onlyUnique);
         es.sort(ordenacion);
         mayor = es[0].value;
         o = 0;
@@ -150,8 +188,8 @@ define(["./painters/colorManager"], function (colorManager) {
         }
         for(e in es) {
             var name = normalized(es[e].name);
-            for(o in zonas.estado) {
-                if(name === normalized(zonas.estado[o])) {
+            for(o in zonas.abreviatura) {
+                if(name === normalized(zonas.abreviatura[o])) {
                     labels[labels.length] = es[e].name;
                     parents[parents.length] = zonas.zona[o];
                     values[values.length] = es[e].value;
@@ -184,10 +222,11 @@ define(["./painters/colorManager"], function (colorManager) {
             values:  values, //[0, 14, 12, 10, 2, 6, 6, 4, 4],
             outsidetextfont: {size: 10, color: "#377eb8"},
             //leaf: {opacity: 0.4},
-            marker: {line: {width: 2}}
+            marker: {line: {width: 2}},
+            colorscale: "Viridis"
         }];
         var layout = merge(generalLayout, {
-            height: 200,
+            height: 220,
             //sunburstcolorway: colors
         });
         
@@ -233,7 +272,7 @@ define(["./painters/colorManager"], function (colorManager) {
             for(var d in data[o]) {
                     for(var f in data[o][d]) {
                         for(var e in data[o][d][f]) {
-                            if(e !== "hora") {
+                            if(e !== "hora" && e!=="origen" && e!=="destino") {
                                 datos = data[o][d][f][e];
                                 for(var v in datos) {
                                     x[v] += datos[v];
@@ -248,7 +287,7 @@ define(["./painters/colorManager"], function (colorManager) {
                 for(var d in data[o]) {
                     for(var f in data[o][d]) {
                         for(var e in data[o][d][f]) {
-                            if(e !== "hora") {
+                            if(e !== "hora" && e!=="origen" && e!=="destino") {
                                 datos = data[o][d][f][e];
                                 for(var v in datos) {
                                     x[v] += datos[v];
@@ -266,7 +305,10 @@ define(["./painters/colorManager"], function (colorManager) {
             type: 'bar',
             x: x,
             y: y,
-            orientation: 'h'
+            orientation: 'h',
+            marker: {
+                color: ['#71f6f6','#7181f6', '#71f677','#eef671','#f6a371']
+            }
         }];
         var layout = {
             height: 200,
@@ -304,45 +346,105 @@ define(["./painters/colorManager"], function (colorManager) {
    }
     /* 
     * ==============================================================================================
-    *                                   Grafica de ODM
+    *                                   Grafica de Shanky
     * ============================================================================================== 
     */
-    function resizeGraficaODM(div, newLayout) {
-        var chart = document.getElementById(div);
-        var layout = chart.layout;
-        layout = merge(layout, newLayout);
-        Plotly.relayout(div, layout);
-    }
+   function crearGraficaSankey(baseUrl,inicio, fin, div, origenS, setLayout, firsTime) {
+       var nOrigen=document.getElementById("nOrigenODM").value||5, nDestino =document.getElementById("nDestinosODM").value||5;
+       if(origenS && origenS!=="0")
+           nOrigen = origenS;
+       var parametros = "?inicio="+inicio+"&fin="+fin+"&norigin="+nOrigen+"&ndestiny="+nDestino; 
+       
+       $.getJSON(baseUrl+"/sankey"+parametros, function (data) {
+            //timer.lap();
+            console.log("============ Conectado con Servidor Sankey ============");
+            console.log(data);
+            if(typeof data === "string") {
+                alert(data);
+                return 0;
+            } 
+            var dataLayout = {
+                type: "sankey",
+                orientation: "h",
+                node: {
+                    pad: 15,
+                    thickness: 30,
+                    line: {
+                      color: "black",
+                      width: 0.5
+                    },
+                    label: data.node.labels,
+                    color: data.node.colors
+                },
+                link: data.link
+            };
+            dataLayout = [dataLayout];
+            var layout = {
+                height: 400,
+                //width: 500,
+                font: {
+                  size: 8
+                }
+            };
+            layout = merge(generalLayout, layout);
+            if(setLayout)
+                layout = merge(layout, setLayout);
+            if(firsTime === true)
+                Plotly.newPlot(div, dataLayout, layout);
+            else {
+                var chart = document.getElementById(div);
+                var newLayout = chart.layout;
+                layout = merge(layout, newLayout);
+                Plotly.react(div, dataLayout, layout);
+            }
+            
+        }).fail(function (e) {
+            console.error(e);
+        });
+   }
     function crearGraficaODM(div, data, origenS, setLayout, firsTime) {
         var labels=[], index={}, i=0, x=[];
-        for(var o in data) {
-            if(o !== "horas" && o !== "tipo") {
-                labels[i] = o;
-                //x[i] = 0;
-                index[o] = i;
-                i++;
-            }
-        }
         //labels[labels.lencght] = "Otros";
         var origen =[], destino=[];
-        var j=0;
+        var j=0, k=0;
         for(o in data) {
             if(o!=="tipo" && o!=="horas") {
-                i= index[o];
+                //i= index[o];
                 origen[i] = origen[i] || {name:o, value:0};
                 for(var d in data[o]) {
+                    if(!index[d] && index[d] !== 0) {
+                        index[d] = k;
+                        k++;
+                    }
                     j = index[d];
                     destino[j] = destino[j] || {name:d, value:0};
                     destino[j].value ++;
                     origen[i].value ++;
+                    j++;
                 }
+                i++;
             }
         }
         origen.sort(ordenacion);
         destino.sort(ordenacion);
+        var nOrigen=document.getElementById("nOrigenODM").value||5, nDestino =document.getElementById("nDestinosODM").value||5;
+        index = {};
+        k=0;
+        i=0;
+        for(var o=0; o<nOrigen && o<origen.length; o++) {
+            labels[o] = origen[o].name;
+            index[origen[o].name] = o;
+        }
+        i=0;
+        for(var o=0; o<nDestino && o<destino.length; o++) {
+            if(!index[destino[o].name] && index[destino[o].name]!==0) {
+                labels[i] = destino[o].name;
+                index[destino[o].name] = i;
+                i++;
+            }
+        }
         var mayorLabel = origen[0].value> destino[0].value? origen[0].value: destino[0].value;
         var labelColors=[];
-        var nOrigen=document.getElementById("nOrigenODM").value||5, nDestino =document.getElementById("nDestinosODM").value||5, k=0;
         i=0;
         var datos =[], source=[], target=[], mayor=0;
         if(origenS && origenS !=="0") {
@@ -352,7 +454,7 @@ define(["./painters/colorManager"], function (colorManager) {
                     d = destino[j].name;
                     for(var f in data[o][d]) {
                         for(var e in data[o][d][f]) {
-                            if(e !== "hora") {
+                            if(e !== "hora" && e!=="origen" && e!=="destino") {
                                 datos = data[o][d][f][e];
                                 for(var v in datos) {
                                     x[k] = x[k] || 0;
@@ -373,7 +475,7 @@ define(["./painters/colorManager"], function (colorManager) {
                     d = destino[j].name;
                     for(var f in data[o][d]) {
                         for(var e in data[o][d][f]) {
-                            if(e !== "hora") {
+                            if(e !== "hora" && e!=="origen" && e!=="destino") {
                                 datos = data[o][d][f][e];
                                 for(var v in datos) {
                                     x[k] = x[k] || 0;
@@ -388,37 +490,22 @@ define(["./painters/colorManager"], function (colorManager) {
                     k++;
                 }
             }
-        /*for(o in data) {
-            if(o !== "horas" && o !== "tipo") {
-                origen[origen.length] = {name:o, value:data[o].length};
-                for(d in data[o]) {
-                    destino[destino.length]={name:d, value: data[o][d].length};
-                    for(var f in data[o][d]) {
-                        for(var e in data[o][d][f]) {
-                            if(e !== "hora") {
-                                datos = data[o][d][f][e];
-                                for(var v in datos) {
-                                    x[i] = x[i] || 0;
-                                    x[i] += datos[v];
-                                }
-                            }
-                        }
-                    }
-                    source[i] = index[o];
-                    target[i] = index[d];
-                    i++;
-                }
-            }
-        }*/
         }
-        var colors =[], idColor;
+        var colors =[], idColor, labelcolors=new Array(labels.length);
         try {
             idColor = document.getElementById("selectColorODM").selectedOptions[0].value;
         } catch(e) {}
         idColor = "Blues";
+        var mayorl = new Array(labels.length);
         for(i in x) {
             var p = (x[i] / mayor) *100;
             colors[i] = colorManager.getGradianColor(idColor, p, 0.5).rgba;
+            o = source[i];
+            mayorl[o] = mayorl[o] || 0;
+            if(!labelcolors[o] || p > mayorl[o]) {
+                labelcolors[o] = colors[i];
+                mayorl[i] = p;
+            }
         }
         /*console.log(labels);
         console.log(target);
@@ -434,8 +521,8 @@ define(["./painters/colorManager"], function (colorManager) {
                 color: "black",
                 width: 0.5
               },
-              label: labels
-              //color: colors
+              label: labels,
+              color: labelcolors
             },
 
             link: {
@@ -529,7 +616,7 @@ define(["./painters/colorManager"], function (colorManager) {
                     for(var f in data[o][d]) {
                         for(var e in data[o][d][f]) {
                             i = index[data[o][d][f]["hora"]];
-                            if(e !== "hora") {
+                            if(e !== "hora" && e!=="origen" && e!=="destino") {
                                 datos = data[o][d][f][e];
                                 for(var v in datos) {
                                     y[i] += datos[v];
@@ -545,7 +632,7 @@ define(["./painters/colorManager"], function (colorManager) {
                         for(var f in data[o][d]) {
                             for(var e in data[o][d][f]) {
                                 i = index[data[o][d][f]["hora"]];
-                                if(e !== "hora") {
+                                if(e !== "hora" && e!=="origen" && e!=="destino") {
                                     datos = data[o][d][f][e];
                                     for(var v in datos) {
                                         y[i] += datos[v];
@@ -566,7 +653,7 @@ define(["./painters/colorManager"], function (colorManager) {
     }
     /* 
     * ==============================================================================================
-    *                                   Grafica de Linea de tiempo
+    *                                   Grafica de HeatMap
     * ============================================================================================== 
     */
     function crearHeatMap(div, data, origen, setLayout, firsTime) {
@@ -593,7 +680,7 @@ define(["./painters/colorManager"], function (colorManager) {
                     for(var f in data[o][d]) {
                         for(var e in data[o][d][f]) {
                             i = indexH[data[o][d][f]["hora"]];
-                            if(e !== "hora") {
+                            if(e !== "hora" && e!=="origen" && e!=="destino") {
                                 datos = data[o][d][f][e];
                                 for(var v in datos) {
                                     z[j][i] = z[j][i] || 0;
@@ -612,7 +699,7 @@ define(["./painters/colorManager"], function (colorManager) {
                         for(var f in data[o][d]) {
                             for(var e in data[o][d][f]) {
                                 i = indexH[data[o][d][f]["hora"]];
-                                if(e !== "hora") {
+                                if(e !== "hora" && e!=="origen" && e!=="destino") {
                                     datos = data[o][d][f][e];
                                     for(var v in datos) {
                                         z[j][i] = z[j][i] || 0;
@@ -685,9 +772,9 @@ define(["./painters/colorManager"], function (colorManager) {
         crearGraficaODM: crearGraficaODM,
         crearTimeLine: crearTimeLine,
         crearGraficaTipo: crearGraficaTipo,
-        resizeGraficaODM: resizeGraficaODM,
         resizeGrafica: resizeGrafica,
-        crearHeatMap: crearHeatMap
+        crearHeatMap: crearHeatMap,
+        crearGraficaSankey: crearGraficaSankey
     };
 });
 

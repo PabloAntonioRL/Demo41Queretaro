@@ -141,26 +141,28 @@ define([
             LectoresCharts.crearTimeLine("timeLineChart", data, inicio, fin, origen,null, true);
             setEventChart();
         }
-            LectoresCharts.crearGraficaDias("graficaDias", data, origen,null, true);
+            LectoresCharts.crearGraficaDias(baseUrl, "graficaDias", data, origen,null, true);
             LectoresCharts.crearGraficaTipo(divTip, data, origen,null, true);
             LectoresCharts.crearGraficaProcedencia(divPro, data, origen,null, true);
-            LectoresCharts.crearGraficaODM(divODM, data, origen,null, true);
+            //LectoresCharts.crearGraficaODM(divODM, data, origen,null, true);
+            LectoresCharts.crearGraficaSankey(baseUrl, inicio, fin, divODM, origen,null, true);
             LectoresCharts.crearHeatMap(divHeat, data, origen,null, true);
     }
-    function actualizarGraficas(data, inicio, fin) {
+    function actualizarGraficas(data, inicio, fin, todas) {
         var origen = selectorO.selectedOptions[0].value;
         if(origen==="0" || origen ===0){
             origen=null;
         }
-        if(inicio && fin) {
+        if(todas === true) {
             actualizarFeatures(data, inicio, fin);
             LectoresCharts.crearTimeLine("timeLineChart", data, inicio, fin, origen);
             setEventChart();
         }
-            LectoresCharts.crearGraficaDias("graficaDias", data, origen, null);
+            LectoresCharts.crearGraficaDias(baseUrl, "graficaDias", data, origen, null);
             LectoresCharts.crearGraficaTipo(divTip, data, origen, null);
             LectoresCharts.crearGraficaProcedencia(divPro, data, origen, null);
-            LectoresCharts.crearGraficaODM(divODM, data, origen, null);
+            //LectoresCharts.crearGraficaODM(divODM, data, origen, null);
+            LectoresCharts.crearGraficaSankey(baseUrl, inicio, fin, divODM, origen,null);
             LectoresCharts.crearHeatMap(divHeat, data, origen,null);
     }
     /*
@@ -258,7 +260,7 @@ define([
                 matriz[id][d] = matriz[id][d]|| {};
                 for(var f in o[d]) {
                     for(var e in o[d][f]) {
-                        if(e !== "hora") {
+                        if(e !== "hora" && e!=="origen" && e!=="destino") {
                             var datos = o[d][f][e];
                             for(var v in datos) {
                                 hora += datos[v];
@@ -317,14 +319,14 @@ define([
             return 0;
         }
         var rango = fi - ini;
-        if(rango > (1000*60*60*10)) {
+       /* if(rango > (1000*60*60*20)) {
             //alert("El rango de tiempo no debe ser mayor a 10 horas");
             loading.fadeOut();
             return 0;
-        }
+        }*/
         getData(inicio, fin, function (data, i, f) {
             actualData = data;
-            actualizarGraficas(data, i, f);
+            actualizarGraficas(data, i, f, true);
             timeRange.inicio = i;
             timeRange.fin = f;
             actualizarLayers(i, f);
@@ -348,7 +350,7 @@ define([
         loading.fadeIn();
         var inicio = fechaI[0].value+" "+horaI.selectedOptions[0].innerHTML;
         var fin = fechaF[0].value+" "+horaF.selectedOptions[0].innerHTML;
-        actualizarGraficas(actualData, inicio, fin);
+        actualizarGraficas(actualData, inicio, fin, true);
         loading.fadeOut();
     });
     var btnLabels = $("#labels");
@@ -398,7 +400,7 @@ define([
             }
             var data, feature;
             data = filtrarTime(actualData, startTime, endTime);
-            actualizarGraficas(data);
+            actualizarGraficas(data, startTime, endTime);
             timeRange.inicio = startTime;
             timeRange.fin = endTime;
             actualizarLayers(startTime, endTime);
@@ -456,17 +458,22 @@ define([
     selectorO.addEventListener("change", function () {
         var inicio = fechaI[0].value+" "+horaI.selectedOptions[0].innerHTML;
         var fin = fechaF[0].value+" "+horaF.selectedOptions[0].innerHTML;
-        actualizarGraficas(actualData);
+        actualizarGraficas(actualData, inicio, fin);
         actualizarLayers(inicio, fin);
     });
     verMatriz.addEventListener("click", function() {
         var x = parseInt(densidad.val());
+        var c = verMatriz.checked;
         if(x < 100) {
             capaMatrizDensidad.visible = true;
             capaMatriz.visible = false;
         } else {
             capaMatrizDensidad.visible = false;
             capaMatriz.visible = true;
+        }
+        if(c===false) {
+            capaMatrizDensidad.visible = false;
+            capaMatriz.visible = false;
         }
     });
     /*
@@ -494,14 +501,19 @@ define([
         var origen = selectorO.selectedOptions[0].value;
         Plotly.purge(divODM);
         divODM = "graficaShanky";
-        LectoresCharts.crearGraficaODM(divODM, actualData, origen,{width: panelShanky.innerWidth()-20, height: panelShanky.innerHeight()-20}, true);
+        var inicio = fechaI[0].value+" "+horaI.selectedOptions[0].innerHTML;
+        var fin = fechaF[0].value+" "+horaF.selectedOptions[0].innerHTML;
+        LectoresCharts.crearGraficaSankey(baseUrl, inicio, fin, divODM, origen,{width: panelShanky.innerWidth()-20, height: panelShanky.innerHeight()-20}, true);
         panelShanky.fadeIn();
     });
     $("#cerrarBalloonChartODM").click(function () {
         var origen = selectorO.selectedOptions[0].value;
         Plotly.purge(divODM);
         divODM = "graficaODM";
-        LectoresCharts.crearGraficaODM(divODM, actualData, origen,{width: 500}, true);
+        var inicio = fechaI[0].value+" "+horaI.selectedOptions[0].innerHTML;
+        var fin = fechaF[0].value+" "+horaF.selectedOptions[0].innerHTML;
+        //LectoresCharts.crearGraficaODM(divODM, actualData, origen, null, true);
+        LectoresCharts.crearGraficaSankey(baseUrl, inicio, fin, divODM, origen, null, true);
         panelShanky.fadeOut();
     });
     panelShanky.resize(function (event) {
