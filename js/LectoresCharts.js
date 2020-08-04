@@ -68,15 +68,16 @@ define(["./painters/colorManager"], function (colorManager) {
             for(var i in data.y) {
                 mayor = data.y[i]>mayor? data.y[i]: mayor;
             }
-            var p, colores=[];
-            for(var i in data.y) {
+            var p, colores=[], y=[];
+            for(i in data.y) {
                 p = (data.y[i]/mayor) *100;
-                colores[i] = colorManager.getGradianColor("viridis_r", p).rgb;
+                colores[data.x[i]-1] = colorManager.getGradianColor("viridis", p).rgb;
+                y[data.x[i]-1] = data.y[i];
             }
             var dataLayout = [
                 {
-                    x: ['Lunes', 'Martes','Miercoles', 'Jueves','Viernes','Sabado', 'Domingo'],
-                    y: data.y, //[20, 14, 23, 10, 30, 15, 22],
+                    x: ['Domingo', 'Lunes', 'Martes','Miercoles', 'Jueves','Viernes','Sabado'],
+                    y: y, //[20, 14, 23, 10, 30, 15, 22],
                     type: 'bar',
                     marker: {
                         color: colores
